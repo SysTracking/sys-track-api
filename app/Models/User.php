@@ -2,15 +2,22 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class User extends Authenticatable
+class User extends Model
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory, softDeletes;
+
+    protected static function booted()
+    {
+        static::deleting(function ($user) {
+            $user->workDays()->each(function ($workday) {
+                $workday->delete();
+            });
+        });
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -34,7 +41,6 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
-        'remember_token',
     ];
 
     /**
@@ -45,4 +51,8 @@ class User extends Authenticatable
     protected $casts = [
         'password' => 'hashed',
     ];
+
+    public function workDays() {
+        return $this->hasMany(WorkDay::class);
+    }
 }
