@@ -21,7 +21,6 @@ return new class extends Migration
             $table->enum('status', ['A0', 'A1', 'A2', 'A3']);
             $table->integer('daily_hours');
 
-            $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
         });
